@@ -33,6 +33,7 @@ import HelloWorld from './components/HelloWorld.vue';
         Trying MAz btn
       </MazBtn>
     </div>
+    
   </div>
 </template>
 
