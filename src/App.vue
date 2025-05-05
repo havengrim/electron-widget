@@ -29,6 +29,9 @@ import HelloWorld from './components/HelloWorld.vue';
         <li>Pinia for state management</li>
         <li>Vue Router for routing</li>
       </ul>
+      <MazBtn>
+        Trying MAz btn
+      </MazBtn>
     </div>
   </div>
 </template>

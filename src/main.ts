@@ -3,9 +3,11 @@ import { createPinia } from 'pinia'
 import './main.css';
 import App from './App.vue'
 import router from './router'
+import 'maz-ui/styles'
 
 const app = createApp(App)
 
 app.use(createPinia()) //use pinia
 app.use(router) //use router
+
 app.mount('#app')
