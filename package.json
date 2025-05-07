@@ -57,6 +57,7 @@
     "@vueuse/core": "^13.1.0",
     "chart.js": "^4.4.9",
     "libphonenumber-js": "^1.9.48",
+    "lucide-vue-next": "^0.508.0",
     "maz-ui": "^3.0.6",
     "node-fetch": "^2.7.0",
     "vue": "^3.2.25",
