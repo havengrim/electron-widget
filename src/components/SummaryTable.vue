@@ -72,12 +72,15 @@
               
               const filteredEmployees = computed(() => {
                 if (!searchQuery.value) return employees.value
+
                 return employees.value.filter((employee) =>
-                  Object.values(employee).some(value =>
-                    String(value).toLowerCase().includes(searchQuery.value.toLowerCase())
-                  )
+                tableHeaders.some(header => {
+                const value = employee[header.key]
+                return value && String(value).toLowerCase().includes(searchQuery.value.toLowerCase())
+                })
                 )
-              })
+                })
+
               
               const fetchEmployees = async () => {
                 try {
@@ -105,38 +108,38 @@
               })
               
               const downloadReport = async () => {
-  loading.value = true
+                loading.value = true
 
-  try {
-    await new Promise(resolve => setTimeout(resolve, 3000)) // Simulate delay
+                try {
+                await new Promise(resolve => setTimeout(resolve, 3000)) // Simulate delay
 
-    const headers = tableHeaders.map(h => h.label)
-    const rows = filteredEmployees.value.map(employee =>
-      tableHeaders.map(header => employee[header.key] || '')
-    )
+                const headers = tableHeaders.map(h => h.label)
+                const rows = filteredEmployees.value.map(employee =>
+                tableHeaders.map(header => employee[header.key] || '')
+                )
 
-    const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
+                const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
 
-    if (window.api?.saveFile) {
-      const filePath = await window.api.saveFile(csvContent, 'employee_report.csv')
+                if (window.api?.saveFile) {
+                const filePath = await window.api.saveFile(csvContent, 'employee_report.csv')
 
-      if (filePath) {
-        toast.success('Report saved successfully', {
-          position: 'bottom-right',
-        })
-      } else {
-        toast.danger('Save operation was cancelled.', { position: 'bottom-right' })
-      }
-    } else {
-      toast.error('Save function is not available.', { position: 'bottom-right' })
-    }
-  } catch (error) {
-    toast.error('Failed to save report', { position: 'bottom-right', timeout: 2000 })
-    console.error(error)
-  } finally {
-    loading.value = false
-  }
-}
+                if (filePath) {
+                toast.success('Report saved successfully', {
+                position: 'bottom-right',
+                })
+                } else {
+                toast.danger('Save operation was cancelled.', { position: 'bottom-right' })
+                }
+                } else {
+                toast.error('Save function is not available.', { position: 'bottom-right' })
+                }
+                } catch (error) {
+                toast.error('Failed to save report', { position: 'bottom-right', timeout: 2000 })
+                console.error(error)
+                } finally {
+                loading.value = false
+                }
+                }
 
               </script>
               
