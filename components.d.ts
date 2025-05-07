@@ -11,8 +11,10 @@ declare module 'vue' {
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     Home: typeof import('./src/components/Home.vue')['default']
     MazCard: typeof import('maz-ui/components')['MazCard']
+    MazFullscreenLoader: typeof import('maz-ui/components')['MazFullscreenLoader']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Sidebar: typeof import('./src/components/Sidebar.vue')['default']
+    Spinner: typeof import('./src/components/Spinner.vue')['default']
   }
 }
