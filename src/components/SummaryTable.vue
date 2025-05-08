@@ -73,13 +73,22 @@
               const filteredEmployees = computed(() => {
                 if (!searchQuery.value) return employees.value
 
-                return employees.value.filter((employee) =>
-                tableHeaders.some(header => {
-                const value = employee[header.key]
-                return value && String(value).toLowerCase().includes(searchQuery.value.toLowerCase())
-                })
+                return employees.value.filter(employee =>
+                  tableHeaders.some(header => {
+                    const value = employee[header.key]
+                    if (!value) return false
+
+                    // Special handling for ID Number (preserve exact match like "03-1358")
+                    if (header.key === 'ID Number') {
+                        return `="${value}"`
+                      }
+
+                    // General case
+                    return String(value).toLowerCase().includes(searchQuery.value.toLowerCase())
+                  })
                 )
-                })
+              })
+
 
               
               const fetchEmployees = async () => {
@@ -111,35 +120,56 @@
                 loading.value = true
 
                 try {
-                await new Promise(resolve => setTimeout(resolve, 3000)) // Simulate delay
+                  await new Promise(resolve => setTimeout(resolve, 3000)) // Simulate delay
 
-                const headers = tableHeaders.map(h => h.label)
-                const rows = filteredEmployees.value.map(employee =>
-                tableHeaders.map(header => employee[header.key] || '')
-                )
+                  const headers = tableHeaders.map(h => h.label)
 
-                const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
+                  // Map the rows and handle 'Complete Name' correctly
+                  const rows = filteredEmployees.value.map(employee =>
+                    tableHeaders.map(header => {
+                      const value = employee[header.key] || ''
 
-                if (window.api?.saveFile) {
-                const filePath = await window.api.saveFile(csvContent, 'employee_report.csv')
+                      // Special handling for 'ID Number' to preserve formatting in Excel
+                      if (header.key === 'ID Number') {
+                        return `'${value}` // Prefix ID number with a single quote to avoid auto-formatting
+                      }
 
-                if (filePath) {
-                toast.success('Report saved successfully', {
-                position: 'bottom-right',
-                })
-                } else {
-                toast.danger('Save operation was cancelled.', { position: 'bottom-right' })
-                }
-                } else {
-                toast.error('Save function is not available.', { position: 'bottom-right' })
-                }
+                      // Special handling for 'Complete Name' to make sure it's treated as one single string
+                      if (header.key === 'Complete Name') {
+                        const fullName = employee['Complete Name']
+                        return fullName ? `"${fullName}"` : '' // Wrap in quotes to ensure it's treated as one field
+                      }
+
+                      // General case
+                      return value
+                    })
+                  )
+
+                  const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
+
+                  // Save the file
+                  if (window.api?.saveFile) {
+                    const filePath = await window.api.saveFile(csvContent, 'employee_report.csv')
+
+                    if (filePath) {
+                      toast.success('Report saved successfully', {
+                        position: 'bottom-right',
+                      })
+                    } else {
+                      toast.danger('Save operation was cancelled.', { position: 'bottom-right' })
+                    }
+                  } else {
+                    toast.error('Save function is not available.', { position: 'bottom-right' })
+                  }
                 } catch (error) {
-                toast.error('Failed to save report', { position: 'bottom-right', timeout: 2000 })
-                console.error(error)
+                  toast.error('Failed to save report', { position: 'bottom-right', timeout: 2000 })
+                  console.error(error)
                 } finally {
-                loading.value = false
+                  loading.value = false
                 }
-                }
+              }
+
+
 
               </script>
               

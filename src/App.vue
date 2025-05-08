@@ -61,7 +61,7 @@
               v-model="selectedValue"
               label="Select Employment Type"
               :options="employmentTypes"
-              class="xl:w-80"
+              class=""
             />
             <p class="maz-text-black font-semibold ">Total for {{ selectedValue }}: {{ employmentTypeTotal[selectedValue] !== undefined ? employmentTypeTotal[selectedValue] : 'Loading...' }}</p>
           </div>
@@ -103,7 +103,6 @@ onMounted(async () => {
       unfilled.value = result.unfilled;
       total.value = result.total;
 
-      // Store the employment type totals (from the API response)
       employmentTypeTotal.value = {
         Permanent: result.permanent,
         Contractual: result.contractual,
