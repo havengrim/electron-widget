@@ -100,7 +100,9 @@
                       'Complete Name': employee['Complete Name'],
                       'Division': employee['Division'],
                       'Section': employee['Section'],
-                      'Employment Status': employee['Employment Status']
+                      'Employment Status': employee['Employment Status'],
+                      'Item Code': employee['Item Code'],
+                      'Fund Source': employee['Fund Source']
                     }))
                   } else {
                     toast.error('Electron API is not available.')
@@ -122,28 +124,36 @@
                 try {
                   await new Promise(resolve => setTimeout(resolve, 3000)) // Simulate delay
 
-                  const headers = tableHeaders.map(h => h.label)
+                  // Add 'Item Code' and 'Fund Source' to the headers for the CSV export
+                  const headers = [
+                    ...tableHeaders.map(h => h.label),
+                    'Item Code', // Add Item Code header
+                    'Fund Source' // Add Fund Source header
+                  ]
 
-                  // Map the rows and handle 'Complete Name' correctly
-                  const rows = filteredEmployees.value.map(employee =>
-                    tableHeaders.map(header => {
-                      const value = employee[header.key] || ''
+                  // Map the rows and include 'Item Code' and 'Fund Source' for export
+                  const rows = filteredEmployees.value.map(employee => {
+                    return [
+                      ...tableHeaders.map(header => {
+                        const value = employee[header.key] || ''
 
-                      // Special handling for 'ID Number' to preserve formatting in Excel
-                      if (header.key === 'ID Number') {
-                        return `'${value}` // Prefix ID number with a single quote to avoid auto-formatting
-                      }
+                        // Special handling for 'ID Number' to preserve formatting in Excel
+                        if (header.key === 'ID Number') {
+                          return `'${value}` // Prefix ID number with a single quote to avoid auto-formatting
+                        }
 
-                      // Special handling for 'Complete Name' to make sure it's treated as one single string
-                      if (header.key === 'Complete Name') {
-                        const fullName = employee['Complete Name']
-                        return fullName ? `"${fullName}"` : '' // Wrap in quotes to ensure it's treated as one field
-                      }
+                        if (header.key === 'Complete Name') {
+                          const fullName = employee['Complete Name']
+                          return fullName ? `"${fullName}"` : '' // Wrap in quotes to ensure it's treated as one field
+                        }
 
-                      // General case
-                      return value
-                    })
-                  )
+                        // General case
+                        return value
+                      }),
+                      employee['Item Code'] || '', // Include Item Code
+                      employee['Fund Source'] || '' // Include Fund Source
+                    ]
+                  })
 
                   const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n')
 
@@ -168,6 +178,7 @@
                   loading.value = false
                 }
               }
+
 
 
 
