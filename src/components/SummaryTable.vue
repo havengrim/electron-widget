@@ -46,44 +46,16 @@
           <template #cell-section="{ value }">
             <span>{{ value }}</span>
           </template>
-          <template #cell-employmentStatus="{ value }">
-            <MazBadge color="primary" outline>{{ value }}</MazBadge>
-          </template>
+        <template #cell-employmentStatus="{ value }">
+  <MazBadge :color="getStatusColor(value)">{{ value }}</MazBadge>
+</template>
         </MazTable>
       </MazTabsContentItem>
       <MazTabsContentItem :tab="2" class="maz-py-4">
-         <MazTable
-          size="sm"
-          v-model="selectedIds"
-          v-model:search-query="searchQuery"
-          v-model:page="page"
-          v-model:page-size="pageSize"
-          search
-          pagination
-          sortable
-          selectable
-          hoverable
-          selected-key="id"
-          :headers="tableHeaders"
-          :rows="filteredEmployees"
-          class="mt-5"
-        >
-          <template #cell-IDNumber="{ value }">
-            <span>{{ value }}</span>
-          </template>
-          <template #cell-completeName="{ value }">
-            <span>{{ value }}</span>
-          </template>
-          <template #cell-division="{ value }">
-            <span>{{ value }}</span>
-          </template>
-          <template #cell-section="{ value }">
-            <span>{{ value }}</span>
-          </template>
-          <template #cell-employmentStatus="{ value }">
-            <MazBadge color="primary" outline>{{ value }}</MazBadge>
-          </template>
-        </MazTable>
+        Tab 2
+      </MazTabsContentItem>
+      <MazTabsContentItem :tab="3" class="maz-py-4">
+        Tab 3
       </MazTabsContentItem>
     </MazTabsContent>
   </MazTabs>
@@ -102,6 +74,23 @@ import { CloudDownload } from 'lucide-vue-next'
     { label: 'Unfilled', disabled: false},
   ]
 const toast = useToast()
+
+const getStatusColor = (status: string) => {
+  switch (status.toLowerCase()) {
+    case 'permanent':
+      return 'info'
+    case 'contractual':
+      return 'warning'
+    case 'job order':
+      return 'success'
+    case 'vacant':
+    case 'unfilled':
+      return 'danger'
+    default:
+      return 'secondary'
+  }
+}
+
 
 const selectedIds = ref([])
 const searchQuery = ref('')
@@ -194,7 +183,7 @@ const downloadReport = async () => {
     if (window.api?.saveFile) {
       const filePath = await window.api.saveFile(csvContent, 'employee_report.csv')
       if (filePath) {
-        toast.info('Report saved successfully', { position: 'bottom-right' })
+        toast.success('Report saved successfully', { position: 'bottom-right' })
       } else {
         toast.danger('Save operation was cancelled.', { position: 'bottom-right' })
       }
