@@ -1,23 +1,23 @@
 <template>
-                <div v-if="loading" class="flex justify-center items-center fixed inset-0 bg-gray-900 ">
-                  <!-- Use maz-ui loading spinner -->
-                   <span>HRiQ</span>
-                  <MazFullscreenLoader :loading="loading" color="white" size="50px" />
-                </div>
-              </template>
-              
-              <script setup>
-              import { ref } from 'vue'
+  <div
+    v-if="loading"
+    class="fixed inset-0 z-50 flex flex-col justify-center items-center bg-gray-900 text-white"
+  >
+      <img :src="logoo" alt="logo" srcset="" class="h-24 w-24 animate-pulse">
 
-              const loading = ref(true)
-              
-              // Simulate loading process (e.g., wait for Electron app to load)
-              setTimeout(() => {
-                loading.value = false
-              }, 10000) 
-              </script>
-              
-              <style scoped>
-              /* Optional styling for spinner */
-              </style>
-              
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import logoo from "../../src/assets/imgs/logoo.png";
+
+const loading = ref(true)
+
+onMounted(() => {
+  // Simulate loading delay
+  setTimeout(() => {
+    loading.value = false
+  }, 20000) 
+})
+</script>

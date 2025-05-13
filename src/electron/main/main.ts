@@ -2,6 +2,7 @@ import { join } from 'path';
 import { app, BrowserWindow, ipcMain, dialog, session } from 'electron';
 import fetch from 'node-fetch'; // npm install node-fetch
 import { installToaster, ToasterOptions } from 'maz-ui'
+
 const isDev = process.env.npm_lifecycle_event === 'app:dev';
 const fs = require('fs')
 async function handleFileOpen() {
@@ -72,16 +73,31 @@ app.whenReady().then(() => {
         try {
             // Replace with your API key and URL
             const response = await fetch(
-                'https://script.googleusercontent.com/echo?user_content_key=AehSKLiZqjpg1r8nnZCHIp9LX8osYcsilz3Nih0GeHGDI3Nkx_Q9HLVKmOtyNXXcDnEjmOW6ptsRH2oMVpSz5l7AOhYv91l_LrCfvta9MN_JsQMrGYXURjRefQGTNT7M8LE7NMdDoDZ64iln5rmyAiPWRQ98e6yOcyHp-Y4oQY0IdYlefY1thfHv5Ikm7zQYwYoJl6uJEhy8-gZf3S2IyPFGpA3aYVEuLeN2_KubCNnHuIOUAlwJtxy99zR_vRCJeewLFh1rCXsXxAfvRR7yz7wZElBK513GiTrpTC0VDQ-39EbYeKjdDOk&lib=M9OpfRqnK_XpO1nhJZ1oxCiJNsr4x2yAK'
+                'https://script.googleusercontent.com/echo?user_content_key=AehSKLimMKGeE86shzjtY0Ny9DDjHC_odqm1YpY27mmwmR1Eki_d00Iyf3hbdUYKEiEh68161LzAYL1Da5125c1c2w3_Lbmo6ec0FwgBxK9mIQove1ImykR7mDDd6JN7XxnS9XAxyGnot8sqjtqek_B6YQsOqV0eFevcd4VHLgIJ5IW-ZFYrcmqBlDsH9-Uc4Mb2_9DNQQwbWNncXtUzlmIV-pHliMhT4wODXGIK0fRMnmFcu_qLfy6rU5-lmWm2kqAF5LuVgsOppsf1c7mOjzGZa9-PgPG70zOLkhxVCLLw&lib=M9OpfRqnK_XpO1nhJZ1oxCiJNsr4x2yAK'
             );
             const data = await response.json();
-            console.log('Fetched Data:', data);
             return data; // Return fetched data
         } catch (error) {
             console.error('Failed to fetch employees:', error);
             return { error: 'Failed to fetch employee data' };
         }
     });
+
+    ipcMain.handle('fetch:unfilled', async () => {
+    try {
+        const response = await fetch(
+        'https://script.googleusercontent.com/echo?user_content_key=AehSKLgUf1iXXFPVYPPH68KWIpwW-O3GP6GxXdiWw6CS4Wztahu3IJ2aJJPV22hDpFiDLCUaFPFQhwN1TRkyaM28J6ik31EnoF7DSw694mK-iqLzfLiYGX7l6TZQAkdJ7bX8P5sU12EhMDxU9Zvi8VyR0EqdBtKA3OdyXl5rWVIEA4nLpXkslipZsGljYHHmV-IzP0YYtHPh4qu1Rx17jYqUgzWWMY_TZIplsVtHOo2As4JwNqK-QWZ0Q7CFDKISqcvotnDjsDAlCS8g8IfZmWXX4j2lzYltKlC9VkeuhgtS&lib=MHgBdPwj5X6NkCv6suuHfaSJNsr4x2yAK'
+        );
+        const data = await response.json();
+        console.log('Fetched unfilled employees:', data);
+        return data; // Return the data to renderer
+    } catch (error) {
+        console.error('Failed to fetch unfilled employees:', error);
+        return { error: 'Failed to fetch unfilled data' }; // Return error message to renderer
+    }
+    });
+
+
 
     createWindow();
 
