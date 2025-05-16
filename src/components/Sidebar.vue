@@ -7,26 +7,32 @@
           <img class="w-auto h-6 filter brightness-110 saturate-50" src="https://merakiui.com/images/logo.svg" alt="Logo" />
         </a>
 
-        <div class="flex flex-col justify-center items-center gap-0 p-1.5 text-gray-200 focus:outline-none transition-colors duration-200 rounded-lg hover:bg-gray-700">
-          <a href="#" class="flex flex-col items-center">
-            <HomeIcon class="w-5 h-5" />
-          </a>
-          <span class="text-sm">Home</span>
-        </div>
+        <router-link to="/" class="flex flex-col items-center">
+          <div class="flex flex-col justify-center items-center gap-0 p-1.5 text-gray-200 focus:outline-none transition-colors duration-200 rounded-lg hover:bg-gray-700">
+            <span href="#" class="flex flex-col items-center">
+              <HomeIcon class="w-5 h-5" />
+            </span>
+            <span class="text-sm">Home</span>
+          </div>
+        </router-link>
+        <router-link to="/about" class="flex flex-col items-center">
+            <div class="flex flex-col justify-center items-center gap-0 p-1.5 text-gray-200 focus:outline-none transition-colors duration-200 rounded-lg hover:bg-gray-700">
+              <span class="flex flex-col items-center">
+                <FileTextIcon class="w-5 h-5" />
+              </span>
+              <span class="text-sm">Contract</span>
+            </div>
+          </router-link>
 
-        <div class="flex flex-col justify-center items-center gap-0 p-1.5 text-gray-200 focus:outline-none transition-colors duration-200 rounded-lg hover:bg-gray-700">
-          <a href="#" class="flex flex-col items-center">
-            <FileTextIcon class="w-5 h-5" />
-          </a>
-          <span class="text-sm">Contract</span>
-        </div>
+        <router-link to="/generate" class="flex flex-col items-center">
 
-        <div class="flex flex-col justify-center items-center gap-0 p-1.5 text-gray-200 focus:outline-none transition-colors duration-200 rounded-lg hover:bg-gray-700">
-          <a href="#" class="flex flex-col items-center">
-            <SettingsIcon class="w-5 h-5" />
-          </a>
-          <span class="text-sm">Settings</span>
-        </div>
+          <div class="flex flex-col justify-center items-center gap-0 p-1.5 text-gray-200 focus:outline-none transition-colors duration-200 rounded-lg hover:bg-gray-700">
+            <span href="#" class="flex flex-col items-center">
+              <GenerateIcon class="w-5 h-5" />
+            </span>
+            <span class="text-sm">Generate</span>
+          </div>
+        </router-link>
       </nav>
 
       <div class="flex flex-col space-y-6">
@@ -43,19 +49,22 @@
 </template>
 
 <script lang="ts">
-import logoo from "../../src/assets/imgs/logoo.png";
 import { defineComponent } from 'vue'
 import {
   Home,
   FileText,
   Settings,
-  LogOut
+  LogOut,
+  Activity,
+  ChartColumn
 } from 'lucide-vue-next'
+
 
 export default defineComponent({
   components: {
     HomeIcon: Home,
     FileTextIcon: FileText,
+    GenerateIcon: ChartColumn,
     SettingsIcon: Settings,
     LogOutIcon: LogOut
   }

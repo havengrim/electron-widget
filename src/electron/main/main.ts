@@ -2,7 +2,7 @@ import { join } from 'path';
 import { app, BrowserWindow, ipcMain, dialog, session } from 'electron';
 import fetch from 'node-fetch'; // npm install node-fetch
 import { installToaster, ToasterOptions } from 'maz-ui'
-
+import { URL } from 'url';
 const isDev = process.env.npm_lifecycle_event === 'app:dev';
 const fs = require('fs')
 async function handleFileOpen() {
@@ -20,6 +20,7 @@ function createWindow() {
             preload: join(__dirname, '../preload/preload.js'), // Ensure this path is correct
             nodeIntegration: false,  // Don't allow Node.js integration in the renderer
             contextIsolation: true,  // Ensure context isolation is enabled
+            webSecurity: false, 
         },
     });
 
@@ -55,6 +56,21 @@ function createWindow() {
 app.whenReady().then(() => {
     ipcMain.handle('dialog:openFile', handleFileOpen);
 
+        ipcMain.handle('fetch:employees', async () => {
+        try {
+            // Replace with your API key and URL
+            const response = await fetch(
+                'https://script.googleusercontent.com/echo?user_content_key=AehSKLimMKGeE86shzjtY0Ny9DDjHC_odqm1YpY27mmwmR1Eki_d00Iyf3hbdUYKEiEh68161LzAYL1Da5125c1c2w3_Lbmo6ec0FwgBxK9mIQove1ImykR7mDDd6JN7XxnS9XAxyGnot8sqjtqek_B6YQsOqV0eFevcd4VHLgIJ5IW-ZFYrcmqBlDsH9-Uc4Mb2_9DNQQwbWNncXtUzlmIV-pHliMhT4wODXGIK0fRMnmFcu_qLfy6rU5-lmWm2kqAF5LuVgsOppsf1c7mOjzGZa9-PgPG70zOLkhxVCLLw&lib=M9OpfRqnK_XpO1nhJZ1oxCiJNsr4x2yAK'
+            );
+            const data = await response.json();
+            return data; // Return fetched data
+        } catch (error) {
+            console.error('Failed to fetch employees:', error);
+            return { error: 'Failed to fetch employee data' };
+        }
+    });
+
+    
     ipcMain.handle('fetch:revenue', async () => {
         try {
             const response = await fetch(
@@ -69,19 +85,6 @@ app.whenReady().then(() => {
         }
     });
 
-    ipcMain.handle('fetch:employees', async () => {
-        try {
-            // Replace with your API key and URL
-            const response = await fetch(
-                'https://script.googleusercontent.com/echo?user_content_key=AehSKLimMKGeE86shzjtY0Ny9DDjHC_odqm1YpY27mmwmR1Eki_d00Iyf3hbdUYKEiEh68161LzAYL1Da5125c1c2w3_Lbmo6ec0FwgBxK9mIQove1ImykR7mDDd6JN7XxnS9XAxyGnot8sqjtqek_B6YQsOqV0eFevcd4VHLgIJ5IW-ZFYrcmqBlDsH9-Uc4Mb2_9DNQQwbWNncXtUzlmIV-pHliMhT4wODXGIK0fRMnmFcu_qLfy6rU5-lmWm2kqAF5LuVgsOppsf1c7mOjzGZa9-PgPG70zOLkhxVCLLw&lib=M9OpfRqnK_XpO1nhJZ1oxCiJNsr4x2yAK'
-            );
-            const data = await response.json();
-            return data; // Return fetched data
-        } catch (error) {
-            console.error('Failed to fetch employees:', error);
-            return { error: 'Failed to fetch employee data' };
-        }
-    });
 
     ipcMain.handle('fetch:unfilled', async () => {
     try {
@@ -122,3 +125,58 @@ ipcMain.handle('save-file', async (_event, content, defaultName) => {
     fs.writeFileSync(filePath, content)
     return filePath
   })
+
+
+
+ipcMain.handle('oauth:login', async () => {
+    const oauthUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    oauthUrl.searchParams.set('client_id', '485462016495-9pq20k1g2lc3aghfo1fkqhi00moeeeu0.apps.googleusercontent.com');
+    oauthUrl.searchParams.set('response_type', 'token');
+    oauthUrl.searchParams.set('redirect_uri', 'http://localhost');
+    oauthUrl.searchParams.set('scope', 'openid profile email');
+    oauthUrl.searchParams.set('prompt', 'consent');
+
+    return new Promise((resolve, reject) => {
+        const authWindow = new BrowserWindow({
+            width: 500,
+            height: 600,
+            webPreferences: {
+                nodeIntegration: false,
+                contextIsolation: true,
+                webSecurity: false,
+            },
+        });
+
+        authWindow.loadURL(oauthUrl.toString());
+
+        const { webContents } = authWindow;
+
+        // This function is used to extract the access token from the URL
+        const handleUrl = (url: string) => {
+            try {
+                if (url.startsWith('http://localhost')) {
+                    // Extract the access token from the URL fragment
+                    const parsed = new URL(url);
+                    const hash = parsed.hash.substring(1);
+                    const params = new URLSearchParams(hash);
+                    const accessToken = params.get('access_token');
+
+                    if (accessToken) {
+                        resolve({ accessToken });
+                        authWindow.close();
+                    }
+                }
+            } catch (err) {
+                reject(err);
+                authWindow.close();
+            }
+        };
+
+        // Listen for redirects and navigation events to capture the access token
+        webContents.on('will-redirect', (_, url) => handleUrl(url));
+        webContents.on('did-navigate', (_, url) => handleUrl(url));
+
+        // Close the window and reject if the user closes the window
+        authWindow.on('closed', () => reject(new Error('User closed window')));
+    });
+});

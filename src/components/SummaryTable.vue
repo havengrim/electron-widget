@@ -13,7 +13,7 @@
   </div>
 
   <MazTabs>
-    <MazTabsBar :items="tabs" />
+    <MazTabsBar :items="tabs" class="!shadow-none border" />
     <MazTabsContent>
 
       <MazTabsContentItem :tab="1" class="maz-py-4">
@@ -49,6 +49,15 @@
           <template #cell-employmentStatus="{ value }">
             <MazBadge :color="getStatusColor(value)">{{ value }}</MazBadge>
           </template>
+             <template #cell-entryDate="{ value }">
+             <span class="">{{ formatDate(value) }}</span>
+          </template>
+           <template #cell-SG="{ value }">
+            <span>{{ value }}</span>
+          </template>
+            <template #cell-salary="{ value }">
+            <span class="">{{ formatToPeso(value) }}</span>
+          </template>
 
           <template #cell-actions="{ row }">
             <MazBtn size="xs" color="info" @click="openDetailsDialogEmployee(row)">
@@ -78,7 +87,7 @@
           </div>
           <div class="p-4">
               <MazTabs>
-            <MazTabsBar :items="employeeTabs" />
+            <MazTabsBar :items="employeeTabs" class="!shadow-none border" />
             <MazTabsContent>
   
               <MazTabsContentItem :tab="1" class="maz-py-4">
@@ -322,7 +331,7 @@
                     </div>
                     <div>
                       <h3 class="font-medium text-muted-foreground">PWD</h3>
-                      <p>{{ selectedEmployee['ACTIVE AND WORKING EMAIL ADDRESS'] || 'NO' }}</p>
+                      <p>{{ selectedEmployee['INDICATE WHETHER PWD'] || 'NO' }}</p>
                     </div>
                     <div>
                       <h3 class="font-medium text-muted-foreground">Indigenous</h3>
@@ -463,7 +472,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed} from 'vue'
 import MazTable from 'maz-ui/components/MazTable'
 import MazBtn from 'maz-ui/components/MazBtn'
 import MazBadge from 'maz-ui/components/MazBadge'
@@ -524,6 +533,9 @@ const tableHeaders = [
   { label: 'Complete Name', key: 'completeName' },
   { label: 'Section', key: 'section' },
   { label: 'Employment Status', key: 'employmentStatus' },
+  { label: 'Start Date', key: 'entryDate',  value: (row: any) => formatDate(row.entryDate)},
+  { label: 'SG', key: 'salaryGrade'},
+  { label: "Salary", key: 'salary'},
   { label: 'Actions', key: 'actions', align: 'center', sortable: false}
 ]
 
@@ -581,7 +593,12 @@ const fetchEmployees = async () => {
         employmentStatus: employee['CLASSIFICATION OF EMPLOYMENT (PERMANENT, COTERMINOUS, CASUAL, CONTRACTUAL, CONTRACT OF SERVICE, JOB ORDER)'], // Matches employment status
         'Item Code': employee['ITEM NUMBER\n \n (ALL STATUS OF EMPLOYMENT)'], // Matches item code
         'Fund Source': employee['FUND SOURCE FOR CONTRACTUAL, CONTRACT OF SERVICE AND JOB ORDER (BASED ON CREATION)'],
-        'DateOriginal': employee['DATE OF ORIGINAL APPOINTMENT\n \n (DD-MMM-YYYY)']
+        'DateOriginal': employee['DATE OF ORIGINAL APPOINTMENT\n \n (DD-MMM-YYYY)'],
+        'entryDate': employee['ENTRY DATE IN DSWD (FIRST DAY IN SERVICE)\n \n (DD-MMM-YYYY)'],
+        'salaryGrade': employee['SG'],
+        'salary':employee['MONTHLY SALARY'],
+        'position': employee['POSITION TITLE']
+
       }));
     } else {
       toast.error('Electron API is not available.');
@@ -651,7 +668,12 @@ const downloadReport = async () => {
       ...tableHeaders.map(h => h.label),
       'Item Code',
       'Fund Source',
-      'DateOriginal'
+      'DateOriginal',
+      'entryDate',
+      'salaryGrade',
+      'salary',
+      'position'
+
     ]
 
     const rows = filteredEmployees.value.map(employee => {
@@ -671,7 +693,11 @@ const downloadReport = async () => {
         }),
         employee['Item Code'] || '',
         employee['Fund Source'] || '',
-        employee['DateOriginal'] || ''
+        employee['DateOriginal'] || '',
+        employee['salaryGrade'] || '',
+        employee['entryDate'] || '',
+        employee['position'] || '',
+        employee['salary'] || '',
       ]
     })
 

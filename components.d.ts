@@ -9,8 +9,12 @@ declare module 'vue' {
   export interface GlobalComponents {
     About: typeof import('./src/components/About.vue')['default']
     Dashboard: typeof import('./src/components/Dashboard.vue')['default']
+    DocumentStats: typeof import('./src/components/DocumentStats.vue')['default']
+    Generate: typeof import('./src/components/Generate.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     Home: typeof import('./src/components/Home.vue')['default']
+    Login: typeof import('./src/components/Login.vue')['default']
+    MazBtn: typeof import('maz-ui/components')['MazBtn']
     MazCard: typeof import('maz-ui/components')['MazCard']
     MazDialog: typeof import('maz-ui/components')['MazDialog']
     MazSelect: typeof import('maz-ui/components')['MazSelect']
